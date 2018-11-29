@@ -1,3 +1,7 @@
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  get '/login' => 'sessions#new'
+  get '/logout' => 'sessions#destroy'
+  get '/auth/:provider/callback' => 'sessions#create', constraints: { provider: /facebook|twitter/ }
+
+  root 'welcome#index'
 end

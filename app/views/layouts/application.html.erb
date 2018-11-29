@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>CognitoOnRails</title>
+    <title>Cognito on Rails</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
   </head>
 
   <body>
+    <%= render "flash" if flash.any? %>
     <%= yield %>
   </body>
 </html>
