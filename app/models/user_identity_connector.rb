@@ -10,13 +10,13 @@ class UserIdentityConnector
   end
 
   def connect_or_create
-    logins = user&.logins || {}
+    logins = @user&.logins || {}
 
-    case omniauth[:provider]
+    case @omniauth[:provider]
     when 'facebook'
-      logins['graph.facebook.com'] = omniauth.dig(:credentials, :token)
+      logins['graph.facebook.com'] = @omniauth.dig(:credentials, :token)
     when 'twitter'
-      logins['api.twitter.com'] = [omniauth.dig(:credentials, :token), omniauth.dig(:credentials, :secret)].join(';')
+      logins['api.twitter.com'] = [@omniauth.dig(:credentials, :token), @omniauth.dig(:credentials, :secret)].join(';')
     else
       raise UnknownProviderError
     end
@@ -26,6 +26,7 @@ class UserIdentityConnector
     ActiveRecord::Base.transaction do
       user = User.find_or_create_by!(identity: res.identity_id)
       user.update_credentials_from(logins)
+      user
     end
 
     # NOTE: How to get AWS access token for authorized user
@@ -33,13 +34,9 @@ class UserIdentityConnector
     # res.identity_id
     # res.credentials
     # res.response_meta_data
-
-    user
   end
 
   private
-
-  attr_reader :user, :omniauth
 
   def client
     @client ||= Aws::CognitoIdentity::Client.new(region: REGION)
