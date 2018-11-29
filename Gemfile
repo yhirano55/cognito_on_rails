@@ -7,6 +7,8 @@ gem 'rails', '~> 5.2.1', '>= 5.2.1.1'
 
 gem 'aws-sdk-cognitoidentity'
 gem 'bootsnap', '>= 1.1.0', require: false
+gem 'omniauth-facebook'
+gem 'omniauth-twitter'
 gem 'puma', '~> 3.11'
 gem 'sqlite3'
 
