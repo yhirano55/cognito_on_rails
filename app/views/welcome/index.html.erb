@@ -6,6 +6,8 @@
     <li>user id: <%= current_user.id %></li>
     <li>user identity: <%= current_user.identity %></li>
     <li>user logins: <%= current_user.logins %></li>
+    <li><%= link_to "connect with facebook", "/auth/facebook" %></li>
+    <li><%= link_to "connect with twitter", "/auth/twitter" %></li>
     <li><%= link_to "logout", logout_path %></li>
   <% end %>
 </ul>

@@ -5,32 +5,30 @@ class UserIdentityConnector
   REGION = Rails.application.credentials.aws[:region]
 
   def initialize(user:, omniauth:)
-    @user = user
+    @logins = user&.logins || {}
     @omniauth = omniauth
   end
 
   def connect_or_create
-    logins = @user&.logins || {}
-
     case @omniauth[:provider]
     when 'facebook'
-      logins['graph.facebook.com'] = @omniauth.dig(:credentials, :token)
+      @logins['graph.facebook.com'] = @omniauth.dig(:credentials, :token)
     when 'twitter'
-      logins['api.twitter.com'] = [@omniauth.dig(:credentials, :token), @omniauth.dig(:credentials, :secret)].join(';')
+      @logins['api.twitter.com'] = [@omniauth.dig(:credentials, :token), @omniauth.dig(:credentials, :secret)].join(';')
     else
       raise UnknownProviderError
     end
 
-    res = client.get_id(identity_pool_id: IDENTITY_POOL_ID, logins: logins)
+    res = client.get_id(identity_pool_id: IDENTITY_POOL_ID, logins: @logins)
 
     ActiveRecord::Base.transaction do
       user = User.find_or_create_by!(identity: res.identity_id)
-      user.update_credentials_from(logins)
+      user.update_credentials_from(@logins)
       user
     end
 
     # NOTE: How to get AWS access token for authorized user
-    # res = client.get_credentials_for_identity(identity_pool_id: IDENTITY_POOL_ID, logins: logins)
+    # res = client.get_credentials_for_identity(identity_pool_id: IDENTITY_POOL_ID, logins: @logins)
     # res.identity_id
     # res.credentials
     # res.response_meta_data
