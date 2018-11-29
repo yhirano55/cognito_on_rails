@@ -14,11 +14,11 @@ ActiveRecord::Schema.define(version: 2018_11_29_084653) do
 
   create_table "credentials", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.string "type", null: false
+    t.string "domain", null: false
     t.string "token", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id", "type"], name: "index_credentials_on_user_id_and_type", unique: true
+    t.index ["user_id", "domain"], name: "index_credentials_on_user_id_and_domain", unique: true
   end
 
   create_table "users", force: :cascade do |t|
