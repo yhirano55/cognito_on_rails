@@ -15,18 +15,15 @@ class UserIdentityConnector
     case @omniauth[:provider]
     when 'facebook'
       @logins['graph.facebook.com'] = @omniauth.dig(:credentials, :token)
-      # res = client.get_id(identity_pool_id: IDENTITY_POOL_ID, logins: @logins)
-      res = client.get_open_id_token_for_developer_identity(identity_pool_id: IDENTITY_POOL_ID, logins: @logins)
     when 'github'
       @logins['github.com'] = Digest::SHA512.hexdigest("#{IDENTITY_POOL_ID}:#{@omniauth.dig(:uuid)}")
-      res = client.get_open_id_token_for_developer_identity(identity_pool_id: IDENTITY_POOL_ID, logins: @logins)
     when 'twitter'
       @logins['api.twitter.com'] = [@omniauth.dig(:credentials, :token), @omniauth.dig(:credentials, :secret)].join(';')
-      # res = client.get_id(identity_pool_id: IDENTITY_POOL_ID, logins: @logins)
-      res = client.get_open_id_token_for_developer_identity(identity_pool_id: IDENTITY_POOL_ID, logins: @logins)
     else
       raise UnknownProviderError
     end
+
+    res = client.get_open_id_token_for_developer_identity(identity_pool_id: IDENTITY_POOL_ID, logins: @logins)
 
     ActiveRecord::Base.transaction do
       user = User.find_or_create_by!(identity: res.identity_id)
